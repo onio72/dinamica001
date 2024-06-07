@@ -113,10 +113,10 @@
         <p>Eje y: \(F \sin \alpha + N - mg = 0\)</p>
         <p>Fr = \(\mu N\)</p>
         <p>
-            Peso: <input type="text" id="peso" size="5"> N<br>
-            Normal: <input type="text" id="normal" size="5"> N<br>
-            Fuerza de rozamiento: <input type="text" id="fuerza-rozamiento" size="5"> N<br>
-            Aceleración: <input type="text" id="aceleracion" size="5"> m/s<sup>2</sup>
+            Peso: <input type="text" id="peso" size="5"> N<span></span><br>
+            Normal: <input type="text" id="normal" size="5"> N<span></span><br>
+            Fuerza de rozamiento: <input type="text" id="fuerza-rozamiento" size="5"> N<span></span><br>
+            Aceleración: <input type="text" id="aceleracion" size="5"> m/s<sup>2</sup><span></span>
         </p>
         <button onclick="comprobarCalculos()">Comprobar 2</button>
         <p id="comprobacion3"></p>
@@ -276,22 +276,70 @@
         function actualizarAngulo(value) {
             angulo = parseFloat(value);
             document.getElementById('anguloValor').innerText = value;
+            reiniciarAnimacion();
             dibujarDiagrama();
         }
 
         function actualizarMasa(value) {
             masa = parseFloat(value);
             document.getElementById('masaValor').innerText = value;
+            reiniciarAnimacion();
         }
 
         function actualizarCoef(value) {
             coefRozamiento = parseFloat(value);
             document.getElementById('coefValor').innerText = value;
+            reiniciarAnimacion();
         }
 
         function actualizarFuerza(value) {
             fuerzaAplicada = parseFloat(value);
             document.getElementById('fuerzaValor').innerText = value;
+            reiniciarAnimacion();
+        }
+
+        function dibujarAnimacion() {
+            const canvas = document.getElementById('animacionCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar plano horizontal
+            ctx.beginPath();
+            ctx.moveTo(0, 200);
+            ctx.lineTo(canvas.width, 200);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Dibujar paquete
+            ctx.fillStyle = '#d3d3d3';
+            ctx.fillRect(x, 150, 50, 50);
+
+            // Dibujar fuerza aplicada
+            const fuerzaHorizontal = fuerzaAplicada * Math.cos(angulo * Math.PI / 180);
+            const fuerzaVertical = fuerzaAplicada * Math.sin(angulo * Math.PI / 180);
+            
+            ctx.beginPath();
+            ctx.moveTo(x + 25, 175);
+            ctx.lineTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([]);
+            ctx.stroke();
+
+            // Dibujar cabeza de la flecha
+            const headlen = 10; // Longitud de la cabeza de la flecha
+            const angle = Math.atan2(-fuerzaVertical, fuerzaHorizontal);
+            ctx.beginPath();
+            ctx.moveTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
+            ctx.lineTo(x + 25 + fuerzaHorizontal - headlen * Math.cos(angle - Math.PI / 6), 175 - fuerzaVertical - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
+            ctx.lineTo(x + 25 + fuerzaHorizontal - headlen * Math.cos(angle + Math.PI / 6), 175 - fuerzaVertical - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillText("F", x + 25 + fuerzaHorizontal / 2 + 10, 175 - fuerzaVertical / 2);
         }
 
         function iniciarAnimacion() {
@@ -324,12 +372,24 @@
 
                 // Dibujar fuerza aplicada
                 ctx.beginPath();
-                ctx.moveTo(x + 25, 200);
-                ctx.lineTo(x + 25 + fuerzaHorizontal, 200 - fuerzaVertical);
+                ctx.moveTo(x + 25, 175);
+                ctx.lineTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                ctx.fillText("F", x + 25 + fuerzaHorizontal / 2 + 10, 200 - fuerzaVertical / 2);
+                ctx.fillText("F", x + 25 + fuerzaHorizontal / 2 + 10, 175 - fuerzaVertical / 2);
+
+                // Dibujar cabeza de la flecha
+                const headlen = 10; // Longitud de la cabeza de la flecha
+                const angle = Math.atan2(-fuerzaVertical, fuerzaHorizontal);
+                ctx.beginPath();
+                ctx.moveTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
+                ctx.lineTo(x + 25 + fuerzaHorizontal - headlen * Math.cos(angle - Math.PI / 6), 175 - fuerzaVertical - headlen * Math.sin(angle - Math.PI / 6));
+                ctx.moveTo(x + 25 + fuerzaHorizontal, 175 - fuerzaVertical);
+                ctx.lineTo(x + 25 + fuerzaHorizontal - headlen * Math.cos(angle + Math.PI / 6), 175 - fuerzaVertical - headlen * Math.sin(angle + Math.PI / 6));
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.stroke();
 
                 x += velocidad;
                 velocidad += aceleracion * 0.1;
@@ -345,28 +405,18 @@
 
         function reiniciarAnimacion() {
             clearInterval(animacion);
-            const canvas = document.getElementById('animacionCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Dibujar plano horizontal
-            ctx.beginPath();
-            ctx.moveTo(0, 200);
-            ctx.lineTo(canvas.width, 200);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Dibujar paquete
-            ctx.fillStyle = '#d3d3d3';
-            ctx.fillRect(0, 150, 50, 50);
             x = 0;
             velocidad = 0;
+            dibujarAnimacion();
         }
 
         window.onload = function() {
             reiniciarAnimacion();
             dibujarDiagrama();
         }
+    </script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
 </body>
 </html>
