@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema de Física</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 20px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .slider {
+            width: 100%;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Problema de Física</h1>
+        <p>Un cuerpo de masa <input type="text" id="masa-input" size="5"> kg está sobre una superficie horizontal y sometido a una fuerza que forma un ángulo <input type="text" id="angulo-input" size="5">º con la superficie. El coeficiente de rozamiento estático es <input type="text" id="coef-rozamiento-input" size="5">. La gravedad es 9.8 m/s<sup>2</sup>.</p>
+        <button onclick="comprobarDatos()">Comprobación 1</button>
+        <p id="comprobacion1"></p>
+
+        <h2>Segunda Ley de Newton</h2>
+        <p>Establecemos un sistema de referencia donde las fuerzas presentes son el peso, la normal, la fuerza aplicada y la fuerza de rozamiento.</p>
+
+        <h2>Diagrama de Fuerzas</h2>
+        <canvas id="diagramaCanvas" width="500" height="300"></canvas>
+
+        <h2>Descomposición de Fuerzas</h2>
+        <p>Introduce los resultados de la descomposición de la fuerza aplicada:</p>
+        <div class="input-group">
+            Componente horizontal: <input type="text" id="fuerza-horizontal" size="5"> N
+        </div>
+        <div class="input-group">
+            Componente vertical: <input type="text" id="fuerza-vertical" size="5"> N
+        </div>
+        <button onclick="comprobarDescomposicion()">Comprobación 2</button>
+        <p id="comprobacion2"></p>
+
+        <h2>Cálculos según la Segunda Ley de Newton</h2>
+        <p>
+            Peso: <input type="text" id="peso" size="5"> N<br>
+            Normal: <input type="text" id="normal" size="5"> N<br>
+            Fuerza de rozamiento: <input type="text" id="fuerza-rozamiento" size="5"> N<br>
+            Aceleración: <input type="text" id="aceleracion" size="5"> m/s<sup>2</sup>
+        </p>
+        <button onclick="comprobarCalculos()">Comprobación 3</button>
+        <p id="comprobacion3"></p>
+
+        <h2>Animación</h2>
+        <canvas id="animacionCanvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <button onclick="iniciarAnimacion()">Animar</button>
+            <button onclick="pausarAnimacion()">Pausar</button>
+            <button onclick="reiniciarAnimacion()">Reiniciar</button>
+        </div>
+        <div class="input-group">
+            <label for="anguloSlider">Ángulo (α):</label>
+            <input type="range" id="anguloSlider" class="slider" min="10" max="60" value="35" oninput="actualizarAngulo(this.value)">
+            <span id="anguloValor">35</span>º
+        </div>
+        <div class="input-group">
+            <label for="masaSlider">Masa (m):</label>
+            <input type="range" id="masaSlider" class="slider" min="1" max="100" value="10" oninput="actualizarMasa(this.value)">
+            <span id="masaValor">10</span> kg
+        </div>
+        <div class="input-group">
+            <label for="coefSlider">Coeficiente de rozamiento:</label>
+            <input type="range" id="coefSlider" class="slider" min="0.1" max="0.8" step="0.01" value="0.4" oninput="actualizarCoef(this.value)">
+            <span id="coefValor">0.40</span>
+        </div>
+        <div class="input-group">
+            <label for="fuerzaSlider">Fuerza aplicada:</label>
+            <input type="range" id="fuerzaSlider" class="slider" min="0" max="200" value="50" oninput="actualizarFuerza(this.value)">
+            <span id="fuerzaValor">50</span> N
+        </div>
+
+        <h2>Solución Numérica</h2>
+        <p id="solucionNumerica"></p>
+    </div>
+
+    <script>
+        let masa, angulo, coefRozamiento, fuerzaAplicada;
+        const g = 9.8;
+        let animacion, x = 0, velocidad = 0;
+
+        function comprobarDatos() {
+            masa = parseFloat(document.getElementById('masa-input').value);
+            angulo = parseFloat(document.getElementById('angulo-input').value);
+            coefRozamiento = parseFloat(document.getElementById('coef-rozamiento-input').value);
+
+            if (isNaN(masa) || isNaN(angulo) || isNaN(coefRozamiento)) {
+                document.getElementById('comprobacion1').innerText = "Por favor, introduce todos los valores correctamente.";
+            } else {
+                document.getElementById('comprobacion1').innerText = "Datos correctos.";
+                dibujarDiagrama();
+            }
+        }
+
+        function dibujarDiagrama() {
+            const canvas = document.getElementById('diagramaCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar cuerpo
+            ctx.fillRect(200, 150, 50, 50);
+
+            // Dibujar vectores
+            ctx.beginPath();
+            ctx.moveTo(225, 150);
+            ctx.lineTo(225, 100);
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+            ctx.fillText("N", 230, 120);
+
+            ctx.beginPath();
+            ctx.moveTo(225, 200);
+            ctx.lineTo(225, 250);
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+            ctx.fillText("mg", 230, 230);
+
+            ctx.beginPath();
+            ctx.moveTo(225, 150);
+            ctx.lineTo(275, 150 - Math.tan(angulo * Math.PI / 180) * 50);
+            ctx.strokeStyle = 'green';
+            ctx.stroke();
+            ctx.fillText("F", 260, 130);
+
+            ctx.beginPath();
+            ctx.moveTo(250, 200);
+            ctx.lineTo(300, 200);
+            ctx.strokeStyle = 'purple';
+            ctx.stroke();
+            ctx.fillText("Fr", 280, 190);
+        }
+
+        function comprobarDescomposicion() {
+            const fHorizontal = parseFloat(document.getElementById('fuerza-horizontal').value);
+            const fVertical = parseFloat(document.getElementById('fuerza-vertical').value);
+            const fAplicada = parseFloat(document.getElementById('fuerzaSlider').value);
+            const anguloRad = angulo * Math.PI / 180;
+
+            const fHorizontalCorrecta = (fAplicada * Math.cos(anguloRad)).toFixed(2);
+            const fVerticalCorrecta = (fAplicada * Math.sin(anguloRad)).toFixed(2);
+
+            if (fHorizontal.toFixed(2) == fHorizontalCorrecta && fVertical.toFixed(2) == fVerticalCorrecta) {
+                document.getElementById('comprobacion2').innerText = "Descomposición correcta.";
+            } else {
+                document.getElementById('comprobacion2').innerText = `Descomposición incorrecta. Valores correctos: Fh=${fHorizontalCorrecta} N, Fv=${fVerticalCorrecta} N.`;
+            }
+        }
+
+        function comprobarCalculos() {
+            const peso = parseFloat(document.getElementById('peso').value);
+            const normal = parseFloat(document.getElementById('normal').value);
+            const fuerzaRozamiento = parseFloat(document.getElementById('fuerza-rozamiento').value);
+            const aceleracion = parseFloat(document.getElementById('aceleracion').value);
+
+            const pesoCorrecto = (masa * g).toFixed(2);
+            const normalCorrecta = (pesoCorrecto - (fuerzaAplicada * Math.sin(angulo * Math.PI / 180))).toFixed(2);
+            const fuerzaRozamientoCorrecta = (coefRozamiento * normalCorrecta).toFixed(2);
+            const fuerzaNeta = (fuerzaAplicada * Math.cos(angulo * Math.PI / 180) - fuerzaRozamientoCorrecta).toFixed(2);
+            const aceleracionCorrecta = (fuerzaNeta / masa).toFixed(2);
+
+            if (peso.toFixed(2) == pesoCorrecto && normal.toFixed(2) == normalCorrecta && fuerzaRozamiento.toFixed(2) == fuerzaRozamientoCorrecta && aceleracion.toFixed(2) == aceleracionCorrecta) {
+                document.getElementById('comprobacion3').innerText = "Cálculos correctos.";
+            } else {
+                document.getElementById('comprobacion3').innerText = "Cálculos incorrectos.";
+            }
+
+            document.getElementById('solucionNumerica').innerText = `Peso: ${pesoCorrecto} N, Normal: ${normalCorrecta} N, Fuerza de rozamiento: ${fuerzaRozamientoCorrecta} N, Aceleración: ${aceleracionCorrecta} m/s²`;
+        }
+
+        function actualizarAngulo(value) {
+            angulo = parseFloat(value);
+            document.getElementById('anguloValor').innerText = value;
+            dibujarDiagrama();
+        }
+
+        function actualizarMasa(value) {
+            masa = parseFloat(value);
+            document.getElementById('masaValor').innerText = value;
+        }
+
+        function actualizarCoef(value) {
+            coefRozamiento = parseFloat(value);
+            document.getElementById('coefValor').innerText = value;
+        }
+
+        function actualizarFuerza(value) {
+            fuerzaAplicada = parseFloat(value);
+            document.getElementById('fuerzaValor').innerText = value;
+        }
+
+        function iniciarAnimacion() {
+            const canvas = document.getElementById('animacionCanvas');
+            const ctx = canvas.getContext('2d');
+            const fuerzaHorizontal = fuerzaAplicada * Math.cos(angulo * Math.PI / 180);
+            const fuerzaVertical = fuerzaAplicada * Math.sin(angulo * Math.PI / 180);
+            const normal = masa * g - fuerzaVertical;
+            const fuerzaRozamiento = coefRozamiento * normal;
+            const fuerzaNeta = fuerzaHorizontal - fuerzaRozamiento;
+            const aceleracion = fuerzaNeta / masa;
+
+            x = 0;
+            velocidad = 0;
+            clearInterval(animacion);
+
+            animacion = setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillRect(x, 350, 50, 50);
+                x += velocidad;
+                velocidad += aceleracion * 0.1;
+                if (x > canvas.width) {
+                    clearInterval(animacion);
+                }
+            }, 100);
+        }
+
+        function pausarAnimacion() {
+            clearInterval(animacion);
+        }
+
+        function reiniciarAnimacion() {
+            clearInterval(animacion);
+            const canvas = document.getElementById('animacionCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 350, 50, 50);
+            x = 0;
+            velocidad = 0;
+        }
+    </script>
+</body>
+</html>
