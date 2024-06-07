@@ -14,35 +14,36 @@
         .input-group {
             margin-bottom: 10px;
         }
+        table {
+            width: 100%;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
         canvas {
             border: 1px solid black;
         }
         .slider {
-            width: 100%;
+            width: 80%;
         }
         .controls {
             display: flex;
             justify-content: space-around;
             margin-top: 10px;
         }
-        .gray-background {
-            background-color: lightgray;
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Problema de dinámica (I)</h1>
-        <table class="gray-background">
+        <table>
             <tr>
                 <td>
-                    Un cuerpo de masa <span id="masa"></span> kg está sobre una superficie horizontal y sometido a una fuerza que forma un ángulo <span id="angulo"></span>º con la superficie. El coeficiente de rozamiento estático es <span id="coef-rozamiento"></span>. La gravedad es 9.8 m/s<sup>2</sup>.
+                    Un cuerpo de masa <span id="masa-span"></span> kg está sobre una superficie horizontal y sometido a una fuerza <span id="fuerza-span"></span> N que forma un ángulo <span id="angulo-span"></span>º con la superficie. El coeficiente de rozamiento estático es <span id="coef-span"></span>. La gravedad es 9.8 m/s².
                 </td>
             </tr>
         </table>
         
-        <h2>Animación</h2>
         <canvas id="animacionCanvas" width="800" height="400"></canvas>
         <div class="controls">
             <button onclick="iniciarAnimacion()">Animar</button>
@@ -70,21 +71,35 @@
             <span id="fuerzaValor">50</span> N
         </div>
 
-        <h2>Resolución del problema</h2>
-        <p>Aplicamos la segunda ley de Newton, que se expresa como \( F = ma \).</p>
-        <p>Las fuerzas presentes son el peso, la normal, la fuerza aplicada y la fuerza de rozamiento.</p>
+        <h2>Resolución del Problema</h2>
+        <p>Aplicamos la segunda ley de Newton:</p>
+        <p>$$\sum \vec{F} = m\vec{a}$$</p>
+        <p>Las fuerzas presentes son:</p>
+        <ul>
+            <li>Peso (mg)</li>
+            <li>Normal (N)</li>
+            <li>Fuerza aplicada (F)</li>
+            <li>Fuerza de rozamiento (Fr)</li>
+        </ul>
 
         <h2>Diagrama de Fuerzas</h2>
         <canvas id="diagramaCanvas" width="500" height="300"></canvas>
+
+        <h2>Descomposición de Fuerzas</h2>
+        <p>Introduce los resultados de la descomposición de la fuerza aplicada:</p>
+        <div class="input-group">
+            Componente horizontal: <input type="text" id="fuerza-horizontal" size="5"> N
+        </div>
+        <div class="input-group">
+            Componente vertical: <input type="text" id="fuerza-vertical" size="5"> N
+        </div>
         <button onclick="comprobarDescomposicion()">Comprobar 1</button>
         <p id="comprobacion2"></p>
 
-        <h2>Cálculos según la Segunda Ley de Newton</h2>
-        <p>
-            Eje x: \( F \cos(\alpha) - F_r = ma \)<br>
-            Eje y: \( F \sin(\alpha) + N - mg = 0 \)<br>
-            \( F_r = \mu N \)
-        </p>
+        <h2>Cálculos</h2>
+        <p>Eje x: $$F \cos \alpha - Fr = ma$$</p>
+        <p>Eje y: $$F \sin \alpha + N - mg = 0$$</p>
+        <p>$$Fr = \mu N$$</p>
         <p>
             Peso: <input type="text" id="peso" size="5"> N<br>
             Normal: <input type="text" id="normal" size="5"> N<br>
@@ -99,48 +114,33 @@
     </div>
 
     <script>
+        let masa = Math.floor(Math.random() * 100) + 1;
+        let angulo = Math.floor(Math.random() * 51) + 10;
+        let coefRozamiento = (Math.random() * 0.7 + 0.1).toFixed(2);
         const g = 9.8;
-        let masa = getRandomInt(1, 100);
-        let angulo = getRandomInt(10, 60);
-        let coefRozamiento = (Math.random() * (0.8 - 0.1) + 0.1).toFixed(2);
-        let fuerzaAplicada = getRandomInt(10, 200);
+        let fuerzaAplicada = Math.floor((1.1 * masa * g * coefRozamiento) + Math.random() * 100);
         let animacion, x = 0, velocidad = 0;
 
-        document.getElementById('masa').innerText = masa;
-        document.getElementById('angulo').innerText = angulo;
-        document.getElementById('coef-rozamiento').innerText = coefRozamiento;
+        document.getElementById('masaSlider').value = masa;
+        document.getElementById('anguloSlider').value = angulo;
+        document.getElementById('coefSlider').value = coefRozamiento;
+        document.getElementById('fuerzaSlider').value = fuerzaAplicada;
+        document.getElementById('masaValor').innerText = masa;
+        document.getElementById('anguloValor').innerText = angulo;
+        document.getElementById('coefValor').innerText = coefRozamiento;
+        document.getElementById('fuerzaValor').innerText = fuerzaAplicada;
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function actualizarAngulo(value) {
-            angulo = parseFloat(value);
-            document.getElementById('anguloValor').innerText = value;
-            dibujarDiagrama();
-        }
-
-        function actualizarMasa(value) {
-            masa = parseFloat(value);
-            document.getElementById('masaValor').innerText = value;
-        }
-
-        function actualizarCoef(value) {
-            coefRozamiento = parseFloat(value);
-            document.getElementById('coefValor').innerText = value;
-        }
-
-        function actualizarFuerza(value) {
-            fuerzaAplicada = parseFloat(value);
-            document.getElementById('fuerzaValor').innerText = value;
-        }
+        document.getElementById('masa-span').innerText = masa;
+        document.getElementById('angulo-span').innerText = angulo;
+        document.getElementById('coef-span').innerText = coefRozamiento;
+        document.getElementById('fuerza-span').innerText = fuerzaAplicada;
 
         function dibujarDiagrama() {
             const canvas = document.getElementById('diagramaCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar plano
+            // Dibujar plano horizontal
             ctx.beginPath();
             ctx.moveTo(50, 200);
             ctx.lineTo(450, 200);
@@ -148,112 +148,69 @@
             ctx.stroke();
 
             // Dibujar cuerpo
-            ctx.fillStyle = 'black';
             ctx.fillRect(200, 150, 50, 50);
 
             // Dibujar vectores
-            // Normal
-            ctx.beginPath();
-            ctx.moveTo(225, 150);
-            ctx.lineTo(225, 100);
-            ctx.strokeStyle = 'red';
-            ctx.stroke();
-            ctx.fillText("N", 230, 120);
-
-            // Peso
-            ctx.beginPath();
-            ctx.moveTo(225, 200);
-            ctx.lineTo(225, 250);
-            ctx.strokeStyle = 'blue';
-            ctx.stroke();
-            ctx.fillText("mg", 230, 230);
+            const anguloRad = angulo * Math.PI / 180;
+            const fuerzaX = 50 * Math.cos(anguloRad);
+            const fuerzaY = -50 * Math.sin(anguloRad);
 
             // Fuerza aplicada
             ctx.beginPath();
             ctx.moveTo(225, 175);
-            ctx.lineTo(225 + 50 * Math.cos(angulo * Math.PI / 180), 175 - 50 * Math.sin(angulo * Math.PI / 180));
+            ctx.lineTo(225 + fuerzaX, 175 + fuerzaY);
             ctx.strokeStyle = 'black';
             ctx.stroke();
-            ctx.fillText("F", 250, 150);
+            ctx.fillText("F", 225 + fuerzaX / 2, 175 + fuerzaY / 2);
 
             // Línea punteada para el ángulo
+            ctx.setLineDash([5, 5]);
             ctx.beginPath();
-            ctx.setLineDash([5, 3]);
             ctx.moveTo(225, 175);
             ctx.lineTo(275, 175);
-            ctx.strokeStyle = 'gray';
+            ctx.strokeStyle = 'grey';
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Ángulo
+            // Angulo
             ctx.beginPath();
-            ctx.arc(225, 175, 20, 0, -angulo * Math.PI / 180, true);
+            ctx.arc(225, 175, 25, 0, -anguloRad, true);
             ctx.stroke();
-            ctx.fillText("α", 245, 190);
+            ctx.fillText("α", 235, 150);
+
+            // Normal
+            ctx.beginPath();
+            ctx.moveTo(225, 200);
+            ctx.lineTo(225, 250);
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+            ctx.fillText("N", 230, 230);
+
+            // Peso
+            ctx.beginPath();
+            ctx.moveTo(225, 150);
+            ctx.lineTo(225, 100);
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+            ctx.fillText("mg", 230, 120);
 
             // Fuerza de rozamiento
             ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(300, 200);
+            ctx.moveTo(225, 200);
+            ctx.lineTo(175, 200);
             ctx.strokeStyle = 'green';
             ctx.stroke();
-            ctx.fillText("Fr", 280, 190);
-        }
-
-        function iniciarAnimacion() {
-            const canvas = document.getElementById('animacionCanvas');
-            const ctx = canvas.getContext('2d');
-            const fuerzaHorizontal = fuerzaAplicada * Math.cos(angulo * Math.PI / 180);
-            const fuerzaVertical = fuerzaAplicada * Math.sin(angulo * Math.PI / 180);
-            const normal = masa * g - fuerzaVertical;
-            const fuerzaRozamiento = coefRozamiento * normal;
-            const fuerzaNeta = fuerzaHorizontal - fuerzaRozamiento;
-            const aceleracion = fuerzaNeta / masa;
-
-            x = 0;
-            velocidad = 0;
-            clearInterval(animacion);
-
-            animacion = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillRect(x, 350, 50, 50);
-                ctx.beginPath();
-                ctx.moveTo(0, 400);
-                ctx.lineTo(canvas.width, 400);
-                ctx.stroke();
-                x += velocidad;
-                velocidad += aceleracion * 0.1;
-                if (x > canvas.width) {
-                    clearInterval(animacion);
-                }
-            }, 100);
-        }
-
-        function pausarAnimacion() {
-            clearInterval(animacion);
-        }
-
-        function reiniciarAnimacion() {
-            clearInterval(animacion);
-            const canvas = document.getElementById('animacionCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillRect(0, 350, 50, 50);
-            ctx.beginPath();
-            ctx.moveTo(0, 400);
-            ctx.lineTo(canvas.width, 400);
-            ctx.stroke();
-            x = 0;
-            velocidad = 0;
+            ctx.fillText("Fr", 190, 190);
         }
 
         function comprobarDescomposicion() {
             const fHorizontal = parseFloat(document.getElementById('fuerza-horizontal').value);
             const fVertical = parseFloat(document.getElementById('fuerza-vertical').value);
+            const fAplicada = parseFloat(document.getElementById('fuerzaSlider').value);
             const anguloRad = angulo * Math.PI / 180;
 
-            const fHorizontalCorrecta = (fuerzaAplicada * Math.cos(anguloRad)).toFixed(2);
-            const fVerticalCorrecta = (fuerzaAplicada * Math.sin(anguloRad)).toFixed(2);
+            const fHorizontalCorrecta = (fAplicada * Math.cos(anguloRad)).toFixed(2);
+            const fVerticalCorrecta = (fAplicada * Math.sin(anguloRad)).toFixed(2);
 
             if (fHorizontal.toFixed(2) == fHorizontalCorrecta && fVertical.toFixed(2) == fVerticalCorrecta) {
                 document.getElementById('comprobacion2').innerText = "Descomposición correcta.";
@@ -283,9 +240,96 @@
             document.getElementById('solucionNumerica').innerText = `Peso: ${pesoCorrecto} N, Normal: ${normalCorrecta} N, Fuerza de rozamiento: ${fuerzaRozamientoCorrecta} N, Aceleración: ${aceleracionCorrecta} m/s²`;
         }
 
+        function actualizarAngulo(value) {
+            angulo = parseFloat(value);
+            document.getElementById('anguloValor').innerText = value;
+            dibujarDiagrama();
+        }
+
+        function actualizarMasa(value) {
+            masa = parseFloat(value);
+            document.getElementById('masaValor').innerText = value;
+        }
+
+        function actualizarCoef(value) {
+            coefRozamiento = parseFloat(value);
+            document.getElementById('coefValor').innerText = value;
+        }
+
+        function actualizarFuerza(value) {
+            fuerzaAplicada = parseFloat(value);
+            document.getElementById('fuerzaValor').innerText = value;
+        }
+
+        function iniciarAnimacion() {
+            const canvas = document.getElementById('animacionCanvas');
+            const ctx = canvas.getContext('2d');
+            const fuerzaHorizontal = fuerzaAplicada * Math.cos(angulo * Math.PI / 180);
+            const fuerzaVertical = fuerzaAplicada * Math.sin(angulo * Math.PI / 180);
+            const normal = masa * g - fuerzaVertical;
+            const fuerzaRozamiento = coefRozamiento * normal;
+            const fuerzaNeta = fuerzaHorizontal - fuerzaRozamiento;
+            const aceleracion = fuerzaNeta / masa;
+
+            x = 0;
+            velocidad = 0;
+            clearInterval(animacion);
+
+            animacion = setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Dibujar plano horizontal
+                ctx.beginPath();
+                ctx.moveTo(50, 200);
+                ctx.lineTo(750, 200);
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+
+                // Dibujar paquete
+                ctx.fillRect(x, 175, 50, 50);
+
+                // Dibujar fuerza aplicada
+                ctx.beginPath();
+                ctx.moveTo(x + 25, 200);
+                ctx.lineTo(x + 25 + fuerzaHorizontal, 200 - fuerzaVertical);
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+                ctx.fillText("F", x + 25 + fuerzaHorizontal / 2, 200 - fuerzaVertical / 2);
+
+                x += velocidad;
+                velocidad += aceleracion * 0.1;
+                if (x > canvas.width) {
+                    clearInterval(animacion);
+                }
+            }, 100);
+        }
+
+        function pausarAnimacion() {
+            clearInterval(animacion);
+        }
+
+        function reiniciarAnimacion() {
+            clearInterval(animacion);
+            const canvas = document.getElementById('animacionCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Dibujar plano horizontal
+            ctx.beginPath();
+            ctx.moveTo(50, 200);
+            ctx.lineTo(750, 200);
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+
+            // Dibujar paquete
+            ctx.fillRect(0, 175, 50, 50);
+            x = 0;
+            velocidad = 0;
+        }
+
         window.onload = function() {
+            reiniciarAnimacion();
             dibujarDiagrama();
         }
     </script>
 </body>
 </html>
+
