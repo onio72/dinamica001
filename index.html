@@ -7,29 +7,40 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .container {
             margin: 20px;
-        }
-        .input-group {
-            margin-bottom: 10px;
+            text-align: center;
         }
         table {
             width: 100%;
             background-color: #f0f0f0;
             padding: 10px;
             border: 1px solid #ccc;
+            margin-bottom: 20px;
         }
         canvas {
             border: 1px solid black;
         }
         .slider {
-            width: 80%;
+            width: 600px;
         }
         .controls {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #animacionCanvas, #diagramaCanvas {
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -39,7 +50,8 @@
         <table>
             <tr>
                 <td>
-                    Un cuerpo de masa <span id="masa-span"></span> kg está sobre una superficie horizontal y sometido a una fuerza <span id="fuerza-span"></span> N que forma un ángulo <span id="angulo-span"></span>º con la superficie. El coeficiente de rozamiento estático es <span id="coef-span"></span>. La gravedad es 9.8 m/s².
+                    Un cuerpo de masa <span id="masa-span"></span> kg está sobre una superficie horizontal y sometido a una fuerza <span id="fuerza-span"></span> N que forma un ángulo <span id="angulo-span"></span>º con la superficie. 
+                    <br>El coeficiente de rozamiento estático es <span id="coef-span"></span>. La gravedad es 9.8 m/s².
                 </td>
             </tr>
         </table>
@@ -73,7 +85,7 @@
 
         <h2>Resolución del Problema</h2>
         <p>Aplicamos la segunda ley de Newton:</p>
-        <p>$$\sum \vec{F} = m\vec{a}$$</p>
+        <p>\(\sum \vec{F} = m\vec{a}\)</p>
         <p>Las fuerzas presentes son:</p>
         <ul>
             <li>Peso (mg)</li>
@@ -97,9 +109,9 @@
         <p id="comprobacion2"></p>
 
         <h2>Cálculos</h2>
-        <p>Eje x: $$F \cos \alpha - Fr = ma$$</p>
-        <p>Eje y: $$F \sin \alpha + N - mg = 0$$</p>
-        <p>$$Fr = \mu N$$</p>
+        <p>Eje x: \(F \cos \alpha - Fr = ma\)</p>
+        <p>Eje y: \(F \sin \alpha + N - mg = 0\)</p>
+        <p>Fr = \(\mu N\)</p>
         <p>
             Peso: <input type="text" id="peso" size="5"> N<br>
             Normal: <input type="text" id="normal" size="5"> N<br>
@@ -145,23 +157,26 @@
             ctx.moveTo(50, 200);
             ctx.lineTo(450, 200);
             ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             // Dibujar cuerpo
+            ctx.fillStyle = '#d3d3d3';
             ctx.fillRect(200, 150, 50, 50);
 
             // Dibujar vectores
             const anguloRad = angulo * Math.PI / 180;
             const fuerzaX = 50 * Math.cos(anguloRad);
-            const fuerzaY = -50 * Math.sin(anguloRad);
+            const fuerzaY = 50 * Math.sin(anguloRad);
 
             // Fuerza aplicada
             ctx.beginPath();
             ctx.moveTo(225, 175);
-            ctx.lineTo(225 + fuerzaX, 175 + fuerzaY);
+            ctx.lineTo(225 + fuerzaX, 175 - fuerzaY);
             ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
             ctx.stroke();
-            ctx.fillText("F", 225 + fuerzaX / 2, 175 + fuerzaY / 2);
+            ctx.fillText("F", 225 + fuerzaX / 2 + 10, 175 - fuerzaY / 2);
 
             // Línea punteada para el ángulo
             ctx.setLineDash([5, 5]);
@@ -183,6 +198,7 @@
             ctx.moveTo(225, 200);
             ctx.lineTo(225, 250);
             ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
             ctx.stroke();
             ctx.fillText("N", 230, 230);
 
@@ -191,6 +207,7 @@
             ctx.moveTo(225, 150);
             ctx.lineTo(225, 100);
             ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
             ctx.stroke();
             ctx.fillText("mg", 230, 120);
 
@@ -199,6 +216,7 @@
             ctx.moveTo(225, 200);
             ctx.lineTo(175, 200);
             ctx.strokeStyle = 'green';
+            ctx.lineWidth = 2;
             ctx.stroke();
             ctx.fillText("Fr", 190, 190);
         }
@@ -213,9 +231,9 @@
             const fVerticalCorrecta = (fAplicada * Math.sin(anguloRad)).toFixed(2);
 
             if (fHorizontal.toFixed(2) == fHorizontalCorrecta && fVertical.toFixed(2) == fVerticalCorrecta) {
-                document.getElementById('comprobacion2').innerText = "Descomposición correcta.";
+                document.getElementById('comprobacion2').innerText = "Descomposición correcta. ✅";
             } else {
-                document.getElementById('comprobacion2').innerText = `Descomposición incorrecta. Valores correctos: Fh=${fHorizontalCorrecta} N, Fv=${fVerticalCorrecta} N.`;
+                document.getElementById('comprobacion2').innerText = `Descomposición incorrecta. Valores correctos: Fh=${fHorizontalCorrecta} N, Fv=${fVerticalCorrecta} N. ❌`;
             }
         }
 
@@ -231,10 +249,25 @@
             const fuerzaNeta = (fuerzaAplicada * Math.cos(angulo * Math.PI / 180) - fuerzaRozamientoCorrecta).toFixed(2);
             const aceleracionCorrecta = (fuerzaNeta / masa).toFixed(2);
 
-            if (peso.toFixed(2) == pesoCorrecto && normal.toFixed(2) == normalCorrecta && fuerzaRozamiento.toFixed(2) == fuerzaRozamientoCorrecta && aceleracion.toFixed(2) == aceleracionCorrecta) {
-                document.getElementById('comprobacion3').innerText = "Cálculos correctos.";
+            if (peso.toFixed(2) == pesoCorrecto) {
+                document.getElementById('peso').nextElementSibling.innerText = "✅";
             } else {
-                document.getElementById('comprobacion3').innerText = "Cálculos incorrectos.";
+                document.getElementById('peso').nextElementSibling.innerText = "❌";
+            }
+            if (normal.toFixed(2) == normalCorrecta) {
+                document.getElementById('normal').nextElementSibling.innerText = "✅";
+            } else {
+                document.getElementById('normal').nextElementSibling.innerText = "❌";
+            }
+            if (fuerzaRozamiento.toFixed(2) == fuerzaRozamientoCorrecta) {
+                document.getElementById('fuerza-rozamiento').nextElementSibling.innerText = "✅";
+            } else {
+                document.getElementById('fuerza-rozamiento').nextElementSibling.innerText = "❌";
+            }
+            if (aceleracion.toFixed(2) == aceleracionCorrecta) {
+                document.getElementById('aceleracion').nextElementSibling.innerText = "✅";
+            } else {
+                document.getElementById('aceleracion').nextElementSibling.innerText = "❌";
             }
 
             document.getElementById('solucionNumerica').innerText = `Peso: ${pesoCorrecto} N, Normal: ${normalCorrecta} N, Fuerza de rozamiento: ${fuerzaRozamientoCorrecta} N, Aceleración: ${aceleracionCorrecta} m/s²`;
@@ -279,21 +312,24 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Dibujar plano horizontal
                 ctx.beginPath();
-                ctx.moveTo(50, 200);
-                ctx.lineTo(750, 200);
+                ctx.moveTo(0, 200);
+                ctx.lineTo(canvas.width, 200);
                 ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 // Dibujar paquete
-                ctx.fillRect(x, 175, 50, 50);
+                ctx.fillStyle = '#d3d3d3';
+                ctx.fillRect(x, 150, 50, 50);
 
                 // Dibujar fuerza aplicada
                 ctx.beginPath();
                 ctx.moveTo(x + 25, 200);
                 ctx.lineTo(x + 25 + fuerzaHorizontal, 200 - fuerzaVertical);
                 ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
                 ctx.stroke();
-                ctx.fillText("F", x + 25 + fuerzaHorizontal / 2, 200 - fuerzaVertical / 2);
+                ctx.fillText("F", x + 25 + fuerzaHorizontal / 2 + 10, 200 - fuerzaVertical / 2);
 
                 x += velocidad;
                 velocidad += aceleracion * 0.1;
@@ -314,13 +350,15 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             // Dibujar plano horizontal
             ctx.beginPath();
-            ctx.moveTo(50, 200);
-            ctx.lineTo(750, 200);
+            ctx.moveTo(0, 200);
+            ctx.lineTo(canvas.width, 200);
             ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             // Dibujar paquete
-            ctx.fillRect(0, 175, 50, 50);
+            ctx.fillStyle = '#d3d3d3';
+            ctx.fillRect(0, 150, 50, 50);
             x = 0;
             velocidad = 0;
         }
