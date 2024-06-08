@@ -140,92 +140,96 @@
         document.getElementById('fuerza-span').innerText = fuerzaAplicada;
 
         function dibujarDiagrama() {
-            const canvas = document.getElementById('diagramaCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const canvas = document.getElementById('diagramaCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar plano horizontal
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+    // Dibujar plano horizontal
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-            // Dibujar cuerpo
-            const size = 100;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2 - size / 2;
-            ctx.fillStyle = '#d3d3d3';
-            ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
+    // Dibujar cuerpo
+    const size = 100;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2 - size / 2;
+    ctx.fillStyle = '#d3d3d3';
+    ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
 
-            // Dibujar vectores
-            const anguloRad = angulo * Math.PI / 180;
-            const fuerzaX = 100 * Math.cos(anguloRad);
-            const fuerzaY = 100 * Math.sin(anguloRad);
-            const normalLength = 100;
-            const pesoLength = 100;
-            const frLength = 50;
+    // Dibujar vectores
+    const anguloRad = angulo * Math.PI / 180;
+    const fuerzaX = 100 * Math.cos(anguloRad);
+    const fuerzaY = 100 * Math.sin(anguloRad);
+    const normalLength = 100;
+    const pesoLength = 100;
+    const frLength = 50;
 
-            // Fuerza aplicada
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + fuerzaX, centerY - fuerzaY);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+    // Fuerza aplicada
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX + fuerzaX, centerY - fuerzaY);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    dibujarFlecha(ctx, centerX + fuerzaX, centerY - fuerzaY, 'black');
+    ctx.fillStyle = 'black'; // Establecer el color para la etiqueta "F"
+    ctx.fillText("F", centerX + fuerzaX / 2 + 10, centerY - fuerzaY / 2 - 5);
 
-            // Dibujar cabeza de la flecha
-            dibujarFlecha(ctx, centerX + fuerzaX, centerY - fuerzaY, 'black');
-            ctx.fillText("F", centerX + fuerzaX / 2 + 10, centerY - fuerzaY / 2 - 5);
+    // Línea punteada para el ángulo
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX + 100, centerY);
+    ctx.strokeStyle = 'grey';
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-            // Línea punteada para el ángulo
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + 100, centerY);
-            ctx.strokeStyle = 'grey';
-            ctx.stroke();
-            ctx.setLineDash([]);
+    // Normal
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX, centerY - normalLength);
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    dibujarFlecha(ctx, centerX, centerY - normalLength, 'red');
+    ctx.fillStyle = 'red'; // Establecer el color para la etiqueta "N"
+    ctx.fillText("N", centerX + 5, centerY - normalLength / 2);
 
-            // Normal
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX, centerY - normalLength);
-            ctx.strokeStyle = 'red';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            dibujarFlecha(ctx, centerX, centerY - normalLength, 'red');
-            ctx.fillText("N", centerX + 5, centerY - normalLength / 2);
+    // Peso
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX, centerY + pesoLength);
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    dibujarFlecha(ctx, centerX, centerY + pesoLength, 'blue');
+    ctx.fillStyle = 'blue'; // Establecer el color para la etiqueta "mg"
+    ctx.fillText("mg", centerX + 5, centerY + pesoLength / 2);
 
-            // Peso
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX, centerY + pesoLength);
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            dibujarFlecha(ctx, centerX, centerY + pesoLength, 'blue');
-            ctx.fillText("mg", centerX + 5, centerY + pesoLength / 2);
+    // Fuerza de rozamiento
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX - frLength, centerY);
+    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    dibujarFlecha(ctx, centerX - frLength, centerY, 'green');
+    ctx.fillStyle = 'green'; // Establecer el color para la etiqueta "Fr"
+    ctx.fillText("Fr", centerX - frLength / 2, centerY - 5);
 
-            // Fuerza de rozamiento
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX - frLength, centerY);
-            ctx.strokeStyle = 'green';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            dibujarFlecha(ctx, centerX - frLength, centerY, 'green');
-            ctx.fillText("Fr", centerX - frLength / 2, centerY - 5);
+    // Ángulo
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 30, 0, -anguloRad, true);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = 'black'; // Establecer el color para la etiqueta "α"
+    ctx.fillText("α", centerX + 20, centerY - 10);
+}
 
-            // Ángulo
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 30, 0, -anguloRad, true);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.fillText("α", centerX + 20, centerY - 10);
-        }
 
         function dibujarFlecha(ctx, endX, endY, color){
             const headlen = 10; // Longitud de la cabeza de la flecha
@@ -410,6 +414,7 @@
 
                 // Dibujar cabeza de la flecha
                 dibujarFlecha(ctx, x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical, 'black');
+                ctx.fillStyle = 'black';
                 ctx.fillText("F", x + size / 2 + fuerzaHorizontal / 2 + 10, 200 - size / 2 - fuerzaVertical / 2 - 5);
 
                 // Línea punteada para el ángulo
