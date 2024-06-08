@@ -28,7 +28,7 @@
             margin: 0 auto;
         }
         .slider {
-            width: 600px;
+            width: 250px;
         }
         .controls {
             display: flex;
@@ -38,7 +38,7 @@
         }
         .input-group {
             margin-bottom: 10px;
-            text-align: center;
+            text-align: left;
         }
         .calculos {
             text-align: left;
@@ -51,8 +51,7 @@
         <table>
             <tr>
                 <td>
-                    Un cuerpo de masa <span id="masa-span"></span> kg está sobre una superficie horizontal y sometido a una fuerza <span id="fuerza-span"></span> N que forma un ángulo <span id="angulo-span"></span>º con la superficie. 
-                    <br>El coeficiente de rozamiento estático es <span id="coef-span"></span>. La gravedad es 9.8 m/s².
+                    Un cuerpo de masa <span id="masa-span"></span> kg está sobre una superficie horizontal y sometido a una fuerza <span id="fuerza-span"></span> N que forma un ángulo <span id="angulo-span"></span>º con la superficie.El coeficiente de rozamiento estático es <span id="coef-span"></span>. La gravedad es 9.8 m/s².
                 </td>
             </tr>
         </table>
@@ -85,9 +84,9 @@
         </div>
 
         <h2>Fuerzas presentes</h2>
-        <canvas id="diagramaCanvas" width="600" height="300"></canvas>
+        <canvas id="diagramaCanvas" width="600" height="600"></canvas>
 
-        <h2>Descomponemos la fuerza aplicada para calcular sus componentes horizontal y vertical.</h2>
+        <h3>Descomponemos la fuerza aplicada para calcular sus componentes horizontal y vertical.</h3>
         <div class="input-group">
             Componente horizontal: F cos α = <input type="text" id="fuerza-horizontal" size="5"> N <span id="check-horizontal"></span>
         </div>
@@ -147,84 +146,93 @@
 
             // Dibujar plano horizontal
             ctx.beginPath();
-            ctx.moveTo(50, 200);
-            ctx.lineTo(550, 200);
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 2;
             ctx.stroke();
 
             // Dibujar cuerpo
+            const size = 100;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - size / 2;
             ctx.fillStyle = '#d3d3d3';
-            ctx.fillRect(200, 150, 100, 100);
+            ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
 
             // Dibujar vectores
             const anguloRad = angulo * Math.PI / 180;
             const fuerzaX = 100 * Math.cos(anguloRad);
             const fuerzaY = 100 * Math.sin(anguloRad);
+            const normalLength = 100;
+            const pesoLength = 100;
+            const frLength = 50;
 
             // Fuerza aplicada
             ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(250 + fuerzaX, 200 - fuerzaY);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + fuerzaX, centerY - fuerzaY);
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 2;
             ctx.stroke();
 
             // Dibujar cabeza de la flecha
-            const headlen = 10; // Longitud de la cabeza de la flecha
-            const angle = Math.atan2(-fuerzaY, fuerzaX);
-            ctx.beginPath();
-            ctx.moveTo(250 + fuerzaX, 200 - fuerzaY);
-            ctx.lineTo(250 + fuerzaX - headlen * Math.cos(angle - Math.PI / 6), 200 - fuerzaY - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.moveTo(250 + fuerzaX, 200 - fuerzaY);
-            ctx.lineTo(250 + fuerzaX - headlen * Math.cos(angle + Math.PI / 6), 200 - fuerzaY - headlen * Math.sin(angle + Math.PI / 6));
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillText("F", 250 + fuerzaX / 2 + 10, 200 - fuerzaY / 2 - 5);
-
-            // Línea punteada para el ángulo
-            ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(300, 200);
-            ctx.strokeStyle = 'grey';
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Angulo
-            ctx.beginPath();
-            ctx.arc(250, 200, 25, 0, -anguloRad, true);
-            ctx.stroke();
-            ctx.fillText("α", 255, 175);
+            dibujarFlecha(ctx, centerX + fuerzaX, centerY - fuerzaY, fuerzaX, -fuerzaY, 'black');
+            ctx.fillText("F", centerX + fuerzaX / 2 + 10, centerY - fuerzaY / 2 - 5);
 
             // Normal
             ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(250, 100);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX, centerY - normalLength);
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
             ctx.stroke();
-            ctx.fillText("N", 255, 150);
+            dibujarFlecha(ctx, centerX, centerY - normalLength, 0, -normalLength, 'red');
+            ctx.fillText("N", centerX + 5, centerY - normalLength / 2);
 
             // Peso
             ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(250, 300);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX, centerY + pesoLength);
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
             ctx.stroke();
-            ctx.fillText("mg", 255, 250);
+            dibujarFlecha(ctx, centerX, centerY + pesoLength, 0, pesoLength, 'blue');
+            ctx.fillText("mg", centerX + 5, centerY + pesoLength / 2);
 
             // Fuerza de rozamiento
             ctx.beginPath();
-            ctx.moveTo(250, 200);
-            ctx.lineTo(150, 200);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX - frLength, centerY);
             ctx.strokeStyle = 'green';
             ctx.lineWidth = 2;
             ctx.stroke();
-            ctx.fillText("Fr", 200, 195);
+            dibujarFlecha(ctx, centerX - frLength, centerY, -frLength, 0, 'green');
+            ctx.fillText("Fr", centerX - frLength / 2, centerY - 5);
+
+            // Ángulo
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, 0, -anguloRad, true);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.fillText("α", centerX + 20, centerY - 10);
+        }
+
+        function dibujarFlecha(ctx, fromx, fromy, tox, toy, color){
+            const headlen = 10; // length of head in pixels
+            const angle = Math.atan2(toy-fromy,tox-fromx);
+            ctx.beginPath();
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(tox, toy);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
+            ctx.stroke();
         }
 
         function comprobarDescomposicion() {
@@ -346,17 +354,7 @@
             ctx.stroke();
 
             // Dibujar cabeza de la flecha
-            const headlen = 10; // Longitud de la cabeza de la flecha
-            const angle = Math.atan2(-fuerzaVertical, fuerzaHorizontal);
-            ctx.beginPath();
-            ctx.moveTo(x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical);
-            ctx.lineTo(x + size / 2 + fuerzaHorizontal - headlen * Math.cos(angle - Math.PI / 6), 200 - size / 2 - fuerzaVertical - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.moveTo(x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical);
-            ctx.lineTo(x + size / 2 + fuerzaHorizontal - headlen * Math.cos(angle + Math.PI / 6), 200 - size / 2 - fuerzaVertical - headlen * Math.sin(angle + Math.PI / 6));
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
+            dibujarFlecha(ctx, x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical, fuerzaHorizontal, -fuerzaVertical, 'black');
             ctx.fillText("F", x + size / 2 + fuerzaHorizontal / 2 + 10, 200 - size / 2 - fuerzaVertical / 2 - 5);
         }
 
@@ -398,22 +396,12 @@
                 ctx.stroke();
 
                 // Dibujar cabeza de la flecha
-                const headlen = 10; // Longitud de la cabeza de la flecha
-                const angle = Math.atan2(-fuerzaVertical, fuerzaHorizontal);
-                ctx.beginPath();
-                ctx.moveTo(x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical);
-                ctx.lineTo(x + size / 2 + fuerzaHorizontal - headlen * Math.cos(angle - Math.PI / 6), 200 - size / 2 - fuerzaVertical - headlen * Math.sin(angle - Math.PI / 6));
-                ctx.moveTo(x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical);
-                ctx.lineTo(x + size / 2 + fuerzaHorizontal - headlen * Math.cos(angle + Math.PI / 6), 200 - size / 2 - fuerzaVertical - headlen * Math.sin(angle + Math.PI / 6));
-                ctx.strokeStyle = 'black';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
+                dibujarFlecha(ctx, x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical, fuerzaHorizontal, -fuerzaVertical, 'black');
                 ctx.fillText("F", x + size / 2 + fuerzaHorizontal / 2 + 10, 200 - size / 2 - fuerzaVertical / 2 - 5);
 
                 x += velocidad;
                 velocidad += aceleracion * 0.1;
-                if (x > canvas.width) {
+                if (x > canvas.width + size) {
                     clearInterval(animacion);
                 }
             }, 100);
