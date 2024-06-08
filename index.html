@@ -179,6 +179,15 @@
             dibujarFlecha(ctx, centerX + fuerzaX, centerY - fuerzaY, 'black');
             ctx.fillText("F", centerX + fuerzaX / 2 + 10, centerY - fuerzaY / 2 - 5);
 
+            // Línea punteada para el ángulo
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + 100, centerY);
+            ctx.strokeStyle = 'grey';
+            ctx.stroke();
+            ctx.setLineDash([]);
+
             // Normal
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
@@ -351,6 +360,15 @@
             // Dibujar cabeza de la flecha
             dibujarFlecha(ctx, x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical, 'black');
             ctx.fillText("F", x + size / 2 + fuerzaHorizontal / 2 + 10, 200 - size / 2 - fuerzaVertical / 2 - 5);
+
+            // Línea punteada para el ángulo
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x + size / 2, 200 - size / 2);
+            ctx.lineTo(x + size / 2 + 100, 200 - size / 2);
+            ctx.strokeStyle = 'grey';
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
 
         function iniciarAnimacion() {
@@ -393,6 +411,15 @@
                 // Dibujar cabeza de la flecha
                 dibujarFlecha(ctx, x + size / 2 + fuerzaHorizontal, 200 - size / 2 - fuerzaVertical, 'black');
                 ctx.fillText("F", x + size / 2 + fuerzaHorizontal / 2 + 10, 200 - size / 2 - fuerzaVertical / 2 - 5);
+
+                // Línea punteada para el ángulo
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x + size / 2, 200 - size / 2);
+                ctx.lineTo(x + size / 2 + 100, 200 - size / 2);
+                ctx.strokeStyle = 'grey';
+                ctx.stroke();
+                ctx.setLineDash([]);
 
                 x += velocidad;
                 velocidad += aceleracion * 0.1;
